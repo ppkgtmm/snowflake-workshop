@@ -6,7 +6,14 @@ SHOW databases;
 
 SHOW schemas;
 
-CREATE OR REPLACE TABLE ROOT_DEPTH (ROOT_DEPTH_ID NUMBER(1), ROOT_DEPTH_CODE TEXT(1), ROOT_DEPTH_NAME TEXT(7), UNIT_OF_MEASURE TEXT(2), RANGE_MIN NUMBER(2), RANGE_MAX NUMBER(2));
+CREATE OR REPLACE TABLE ROOT_DEPTH (
+       ROOT_DEPTH_ID NUMBER(1), 
+       ROOT_DEPTH_CODE TEXT(1), 
+       ROOT_DEPTH_NAME TEXT(7), 
+       UNIT_OF_MEASURE TEXT(2), 
+       RANGE_MIN NUMBER(2), 
+       RANGE_MAX NUMBER(2)
+);
 
 ALTER TABLE GARDEN_PLANTS.FLOWERS.ROOT_DEPTH RENAME TO GARDEN_PLANTS.VEGGIES.ROOT_DEPTH;
 
@@ -30,9 +37,15 @@ LIMIT 10;
 SELECT *
 FROM GARDEN_PLANTS.VEGGIES.VEGETABLE_DETAILS;
 
-CREATE FILE FORMAT garden_plants.veggies.PIPECOLSEP_ONEHEADROW TYPE = 'CSV' field_delimiter = '|' skip_header = 1;
+CREATE FILE FORMAT garden_plants.veggies.PIPECOLSEP_ONEHEADROW
+TYPE = 'CSV' 
+field_delimiter = '|' 
+skip_header = 1;
 
-CREATE FILE FORMAT garden_plants.veggies.COMMASEP_DBLQUOT_ONEHEADROW TYPE = 'CSV' skip_header = 1 field_optionally_enclosed_by = '"';
+CREATE FILE FORMAT garden_plants.veggies.COMMASEP_DBLQUOT_ONEHEADROW 
+TYPE = 'CSV' 
+skip_header = 1 
+field_optionally_enclosed_by = '"';
 
 SELECT *
 FROM garden_plants.veggies.vegetable_details;
@@ -45,11 +58,18 @@ SHOW FILE formats IN account;
 
 USE ROLE accountadmin;
 
-CREATE OR REPLACE api integration dora_api_integration api_provider = aws_api_gateway api_aws_role_arn = 'arn:aws:iam::321463406630:role/snowflakeLearnerAssumedRole' enabled = TRUE api_allowed_prefixes = ('https:--awy6hshxy4.execute-api.us-west-2.amazonaws.com/dev/edu_dora');
+CREATE OR REPLACE api integration dora_api_integration 
+api_provider = aws_api_gateway 
+api_aws_role_arn = 'arn:aws:iam::321463406630:role/snowflakeLearnerAssumedRole' 
+enabled = TRUE 
+api_allowed_prefixes = ('https:--awy6hshxy4.execute-api.us-west-2.amazonaws.com/dev/edu_dora');
 
 USE ROLE accountadmin;
 
-CREATE OR REPLACE EXTERNAL FUNCTION util_db.public.grader(step VARCHAR , passed BOOLEAN , actual INTEGER , expected INTEGER , description VARCHAR) RETURNS variant api_integration = dora_api_integration context_headers = (CURRENT_TIMESTAMP, current_account, current_statement, current_account_name) AS 'https:--awy6hshxy4.execute-api.us-west-2.amazonaws.com/dev/edu_dora/grader';
+CREATE OR REPLACE EXTERNAL FUNCTION util_db.public.grader(step VARCHAR , passed BOOLEAN , actual INTEGER , expected INTEGER , description VARCHAR) RETURNS variant 
+api_integration = dora_api_integration 
+context_headers = (CURRENT_TIMESTAMP, current_account, current_statement, current_account_name) AS 
+'https:--awy6hshxy4.execute-api.us-west-2.amazonaws.com/dev/edu_dora/grader';
 
 USE ROLE accountadmin;
 
@@ -73,8 +93,7 @@ SELECT *
 FROM GARDEN_PLANTS.INFORMATION_SCHEMA.SCHEMATA
 WHERE SCHEMA_NAME IN ('FLOWERS','FRUITS','VEGGIES');
 
-SELECT COUNT(*) AS SCHEMAS_FOUND,
-       '3' AS SCHEMAS_EXPECTED
+SELECT COUNT(*) AS SCHEMAS_FOUND, '3' AS SCHEMAS_EXPECTED
 FROM GARDEN_PLANTS.INFORMATION_SCHEMA.SCHEMATA
 WHERE SCHEMA_NAME IN ('FLOWERS','FRUITS','VEGGIES');
 
@@ -91,37 +110,61 @@ list @UTIL_DB.PUBLIC.LIKE_A_WINDOW_INTO_AN_S3_BUCKET/this_;
 
 list @UTIL_DB.PUBLIC.LIKE_A_WINDOW_INTO_AN_S3_BUCKET/THIS_;
 
-CREATE OR REPLACE TABLE garden_plants.veggies.vegetable_details_soil_type (plant_name TEXT(25), soil_type NUMBER(1));
+CREATE OR REPLACE TABLE garden_plants.veggies.vegetable_details_soil_type (
+       plant_name TEXT(25),
+       soil_type NUMBER(1)
+);
 
 COPY INTO garden_plants.veggies.vegetable_details_soil_type
-FROM @UTIL_DB.PUBLIC.LIKE_A_WINDOW_INTO_AN_S3_BUCKET files = ('VEG_NAME_TO_SOIL_TYPE_PIPE.txt') file_format = (format_name = GARDEN_PLANTS.VEGGIES.PIPECOLSEP_ONEHEADROW);
+FROM @UTIL_DB.PUBLIC.LIKE_A_WINDOW_INTO_AN_S3_BUCKET 
+files = ('VEG_NAME_TO_SOIL_TYPE_PIPE.txt') 
+file_format = (format_name = GARDEN_PLANTS.VEGGIES.PIPECOLSEP_ONEHEADROW);
 
 SELECT $1
 FROM @util_db.public.like_a_window_into_an_s3_bucket/LU_SOIL_TYPE.tsv;
 
 SELECT $1,$2,$3
-FROM @util_db.public.like_a_window_into_an_s3_bucket/LU_SOIL_TYPE.tsv (file_format => garden_plants.veggies.COMMASEP_DBLQUOT_ONEHEADROW);
+FROM @util_db.public.like_a_window_into_an_s3_bucket/LU_SOIL_TYPE.tsv 
+(file_format => garden_plants.veggies.COMMASEP_DBLQUOT_ONEHEADROW);
 
 SELECT $1,$2,$3
-FROM @util_db.public.like_a_window_into_an_s3_bucket/LU_SOIL_TYPE.tsv (file_format => garden_plants.veggies.PIPECOLSEP_ONEHEADROW);
+FROM @util_db.public.like_a_window_into_an_s3_bucket/LU_SOIL_TYPE.tsv
+(file_format => garden_plants.veggies.PIPECOLSEP_ONEHEADROW);
 
-CREATE OR REPLACE FILE FORMAT garden_plants.veggies.L8_CHALLENGE_FF TYPE = CSV FIELD_DELIMITER = '\t' SKIP_HEADER = 1;
+CREATE OR REPLACE FILE FORMAT garden_plants.veggies.L8_CHALLENGE_FF 
+TYPE = CSV 
+FIELD_DELIMITER = '\t' 
+SKIP_HEADER = 1;
 
 SELECT $1,$2,$3
-FROM @util_db.public.like_a_window_into_an_s3_bucket/LU_SOIL_TYPE.tsv (file_format => garden_plants.veggies.L8_CHALLENGE_FF);
+FROM @util_db.public.like_a_window_into_an_s3_bucket/LU_SOIL_TYPE.tsv 
+(file_format => garden_plants.veggies.L8_CHALLENGE_FF);
 
-CREATE OR REPLACE TABLE GARDEN_PLANTS.VEGGIES.LU_SOIL_TYPE(SOIL_TYPE_ID NUMBER, SOIL_TYPE TEXT(15), SOIL_DESCRIPTION TEXT(75));
+CREATE OR REPLACE TABLE GARDEN_PLANTS.VEGGIES.LU_SOIL_TYPE(
+       SOIL_TYPE_ID NUMBER, 
+       SOIL_TYPE TEXT(15), 
+       SOIL_DESCRIPTION TEXT(75)
+);
 
 COPY INTO GARDEN_PLANTS.VEGGIES.LU_SOIL_TYPE
-FROM @util_db.public.like_a_window_into_an_s3_bucket files = ('LU_SOIL_TYPE.tsv') file_format = (format_name = garden_plants.veggies.L8_CHALLENGE_FF);
+FROM @util_db.public.like_a_window_into_an_s3_bucket
+files = ('LU_SOIL_TYPE.tsv') 
+file_format = (format_name = garden_plants.veggies.L8_CHALLENGE_FF);
 
 SELECT *
 FROM GARDEN_PLANTS.VEGGIES.LU_SOIL_TYPE;
 
-CREATE OR REPLACE TABLE GARDEN_PLANTS.VEGGIES.VEGETABLE_DETAILS_PLANT_HEIGHT(plant_name TEXT(25), UOM TEXT(1), Low_End_of_Range NUMBER(2), High_End_of_Range NUMBER(2));
+CREATE OR REPLACE TABLE GARDEN_PLANTS.VEGGIES.VEGETABLE_DETAILS_PLANT_HEIGHT(
+       plant_name TEXT(25), 
+       UOM TEXT(1), 
+       Low_End_of_Range NUMBER(2), 
+       High_End_of_Range NUMBER(2)
+);
 
 COPY INTO GARDEN_PLANTS.VEGGIES.VEGETABLE_DETAILS_PLANT_HEIGHT
-FROM @util_db.public.like_a_window_into_an_s3_bucket files = ('veg_plant_height.csv') file_format = (format_name = GARDEN_PLANTS.VEGGIES.COMMASEP_DBLQUOT_ONEHEADROW);
+FROM @util_db.public.like_a_window_into_an_s3_bucket 
+files = ('veg_plant_height.csv') 
+file_format = (format_name = GARDEN_PLANTS.VEGGIES.COMMASEP_DBLQUOT_ONEHEADROW);
 
 USE ROLE sysadmin;
 
@@ -133,7 +176,12 @@ USE DATABASE LIBRARY_CARD_CATALOG;
 
 -- CREATE Author TABLE
 
-CREATE OR REPLACE TABLE AUTHOR (AUTHOR_UID NUMBER ,FIRST_NAME VARCHAR(50) , MIDDLE_NAME VARCHAR(50) , LAST_NAME VARCHAR(50));
+CREATE OR REPLACE TABLE AUTHOR (
+       AUTHOR_UID NUMBER,
+       FIRST_NAME VARCHAR(50),
+       MIDDLE_NAME VARCHAR(50),
+       LAST_NAME VARCHAR(50)
+);
 
 -- INSERT the FIRST two authors INTO the Author TABLE
 
@@ -182,7 +230,11 @@ START 1 INCREMENT 1 COMMENT = 'Use this to fill IN the BOOK_UID everytime you AD
 -- CREATE the book TABLE AND USE the NEXTVAL AS the
 -- DEFAULT VALUE EACH TIME a ROW IS added to the TABLE
 
-CREATE OR REPLACE TABLE BOOK (BOOK_UID NUMBER DEFAULT SEQ_BOOK_UID.nextval , TITLE VARCHAR(50) , YEAR_PUBLISHED NUMBER(4, 0));
+CREATE OR REPLACE TABLE BOOK (
+       BOOK_UID NUMBER DEFAULT SEQ_BOOK_UID.nextval,
+       TITLE VARCHAR(50),
+       YEAR_PUBLISHED NUMBER(4, 0)
+);
 
 -- INSERT records INTO the book TABLE
 -- You don't have to list anything for the
@@ -195,7 +247,10 @@ VALUES ('Food',2001), ('Food',2006), ('Food',2008), ('Food',2016), ('Food',2015)
 -- CREATE the relationships TABLE
 -- this IS sometimes called a "Many-to-Many table"
 
-CREATE TABLE BOOK_TO_AUTHOR (BOOK_UID NUMBER ,AUTHOR_UID NUMBER);
+CREATE TABLE BOOK_TO_AUTHOR (
+       BOOK_UID NUMBER,
+       AUTHOR_UID NUMBER
+);
 
 --Insert ROWS of the known relationships
 
@@ -224,12 +279,21 @@ CREATE TABLE LIBRARY_CARD_CATALOG.PUBLIC.AUTHOR_INGEST_JSON (RAW_AUTHOR VARIANT)
 
 --Create FILE FORMAT for JSON Data
 
-CREATE OR REPLACE FILE FORMAT LIBRARY_CARD_CATALOG.PUBLIC.JSON_FILE_FORMAT TYPE = 'JSON' COMPRESSION = 'AUTO' ENABLE_OCTAL = FALSE ALLOW_DUPLICATE = FALSE STRIP_OUTER_ARRAY = TRUE STRIP_NULL_VALUES = FALSE IGNORE_UTF8_ERRORS = FALSE;
+CREATE OR REPLACE FILE FORMAT LIBRARY_CARD_CATALOG.PUBLIC.JSON_FILE_FORMAT 
+TYPE = 'JSON' 
+COMPRESSION = 'AUTO' 
+ENABLE_OCTAL = FALSE 
+ALLOW_DUPLICATE = FALSE 
+STRIP_OUTER_ARRAY = TRUE 
+STRIP_NULL_VALUES = FALSE 
+IGNORE_UTF8_ERRORS = FALSE;
 
 list @util_db.public.like_a_window_into_an_s3_bucket;
 
 COPY INTO LIBRARY_CARD_CATALOG.PUBLIC.AUTHOR_INGEST_JSON
-FROM @util_db.public.like_a_window_into_an_s3_bucket files = ('author_with_header.json') file_format = (format_name = LIBRARY_CARD_CATALOG.PUBLIC.JSON_FILE_FORMAT);
+FROM @util_db.public.like_a_window_into_an_s3_bucket 
+files = ('author_with_header.json') 
+file_format = (format_name = LIBRARY_CARD_CATALOG.PUBLIC.JSON_FILE_FORMAT);
 
 SELECT *
 FROM author_ingest_json;
@@ -246,7 +310,9 @@ FROM author_ingest_json;
 CREATE OR REPLACE TABLE LIBRARY_CARD_CATALOG.PUBLIC.NESTED_INGEST_JSON ("RAW_NESTED_BOOK" VARIANT);
 
 COPY INTO LIBRARY_CARD_CATALOG.PUBLIC.NESTED_INGEST_JSON
-FROM @util_db.public.like_a_window_into_an_s3_bucket files = ('json_book_author_nested.json') file_format = (format_name = LIBRARY_CARD_CATALOG.PUBLIC.JSON_FILE_FORMAT);
+FROM @util_db.public.like_a_window_into_an_s3_bucket 
+files = ('json_book_author_nested.json') 
+file_format = (format_name = LIBRARY_CARD_CATALOG.PUBLIC.JSON_FILE_FORMAT);
 
 --a few simple queries
 
@@ -283,10 +349,19 @@ CREATE TABLE SOCIAL_MEDIA_FLOODGATES.PUBLIC.TWEET_INGEST ("RAW_STATUS" VARIANT) 
 
 --Create a JSON FILE FORMAT IN the NEW DATABASE
 
-CREATE FILE FORMAT SOCIAL_MEDIA_FLOODGATES.PUBLIC.JSON_FILE_FORMAT TYPE = 'JSON' COMPRESSION = 'AUTO' ENABLE_OCTAL = FALSE ALLOW_DUPLICATE = FALSE STRIP_OUTER_ARRAY = TRUE STRIP_NULL_VALUES = FALSE IGNORE_UTF8_ERRORS = FALSE;
+CREATE FILE FORMAT SOCIAL_MEDIA_FLOODGATES.PUBLIC.JSON_FILE_FORMAT 
+TYPE = 'JSON' 
+COMPRESSION = 'AUTO' 
+ENABLE_OCTAL = FALSE
+ALLOW_DUPLICATE = FALSE 
+STRIP_OUTER_ARRAY = TRUE 
+STRIP_NULL_VALUES = FALSE 
+IGNORE_UTF8_ERRORS = FALSE;
 
 COPY INTO SOCIAL_MEDIA_FLOODGATES.PUBLIC.TWEET_INGEST
-FROM @UTIL_DB.PUBLIC.LIKE_A_WINDOW_INTO_AN_S3_BUCKET files = ('nutrition_tweets.json') file_format = SOCIAL_MEDIA_FLOODGATES.PUBLIC.JSON_FILE_FORMAT;
+FROM @UTIL_DB.PUBLIC.LIKE_A_WINDOW_INTO_AN_S3_BUCKET 
+files = ('nutrition_tweets.json') 
+file_format = SOCIAL_MEDIA_FLOODGATES.PUBLIC.JSON_FILE_FORMAT;
 
 SELECT raw_status:entities:hashtags[0].text
 FROM tweet_ingest
