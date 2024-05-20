@@ -21,30 +21,7 @@ USE role sysadmin;
 list @ZENAS_ATHLEISURE_DB.PRODUCTS.UNI_KLAUS_CLOTHING;
 list @ZENAS_ATHLEISURE_DB.PRODUCTS.UNI_KLAUS_ZMD;
 list @ZENAS_ATHLEISURE_DB.PRODUCTS.UNI_KLAUS_SNEAKERS;
-SELECT
-    GRADER(
-        step,
-        (actual = expected),
-        actual,
-        expected,
-        description
-    ) AS graded_results
-FROM
-    (
-        SELECT
-            'DLKW01' AS step,(
-                SELECT
-                    COUNT(*)
-                FROM
-                    ZENAS_ATHLEISURE_DB.INFORMATION_SCHEMA.STAGES
-                WHERE
-                    stage_url ilike ('%/clothing%')
-                    OR stage_url ilike ('%/zenas_metadata%')
-                    OR stage_url LIKE ('%/sneakers%')
-            ) AS actual,
-            3 AS expected,
-            'Stages for Klaus bucket look good' AS description
-    );
+
 list @UNI_KLAUS_ZMD;
 SELECT
     $1
@@ -102,40 +79,7 @@ SELECT
     *
 FROM
     zenas_athleisure_db.products.SWEATBAND_PRODUCT_LINE;
-SELECT
-    GRADER(
-        step,
-        (actual = expected),
-        actual,
-        expected,
-        description
-    ) AS graded_results
-FROM
-    (
-        SELECT
-            'DLKW02' AS step,(
-                SELECT
-                    SUM(tally)
-                FROM
-                    (
-                        SELECT
-                            COUNT(*) AS tally
-                        FROM
-                            ZENAS_ATHLEISURE_DB.PRODUCTS.SWEATBAND_PRODUCT_LINE
-                        WHERE
-                            LENGTH(product_code) > 7
-                        UNION
-                        SELECT
-                            COUNT(*) AS tally
-                        FROM
-                            ZENAS_ATHLEISURE_DB.PRODUCTS.SWEATSUIT_SIZES
-                        WHERE
-                            LEFT(sizes_available, 2) = CHAR(13) || CHAR(10)
-                    )
-            ) AS actual,
-            0 AS expected,
-            'Leave data WHERE it lands.' AS description
-    );
+
 list @ZENAS_ATHLEISURE_DB.PRODUCTS.UNI_KLAUS_CLOTHING;
 SELECT
     metadata$filename,
@@ -224,26 +168,7 @@ FROM
     sweatsuits s
     JOIN directory(@uni_klaus_clothing) d ON endswith(s.direct_url, d.relative_path)
     CROSS JOIN sweatsuit_sizes;
-SELECT
-    GRADER(
-        step,
-        (actual = expected),
-        actual,
-        expected,
-        description
-    ) AS graded_results
-FROM
-    (
-        SELECT
-            'DLKW03' AS step,(
-                SELECT
-                    COUNT(*)
-                FROM
-                    ZENAS_ATHLEISURE_DB.PRODUCTS.CATALOG
-            ) AS actual,
-            198 AS expected,
-            'Cross-joined VIEW exists' AS description
-    );
+
 -- ADD a TABLE to MAP the sweat suits to the sweat band sets
     CREATE TABLE ZENAS_ATHLEISURE_DB.PRODUCTS.UPSELL_MAPPING (
         SWEATSUIT_COLOR_OR_STYLE VARCHAR(25),
@@ -293,28 +218,7 @@ WHERE
     price < 200 -- high priced items LIKE vintage sweatsuits aren't a good fit for this website
     AND image_size < 1000000 -- large images need to be processed to a smaller size
 ;
-SELECT
-    GRADER(
-        step,
-        (actual = expected),
-        actual,
-        expected,
-        description
-    ) AS graded_results
-FROM
-    (
-        SELECT
-            'DLKW04' AS step,(
-                SELECT
-                    COUNT(*)
-                FROM
-                    zenas_athleisure_db.products.catalog_for_website
-                WHERE
-                    upsell_product_desc LIKE '%NUS:%'
-            ) AS actual,
-            6 AS expected,
-            'Relentlessly resourceful' AS description
-    );
+
 list @MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.TRAILS_GEOJSON;
 list @MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.TRAILS_PARQUET;
 SELECT
@@ -329,36 +233,7 @@ FROM
     @MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.TRAILS_PARQUET (
         file_format => MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.FF_PARQUET
     );
-SELECT
-    GRADER(
-        step,
-        (actual = expected),
-        actual,
-        expected,
-        description
-    ) AS graded_results
-FROM
-    (
-        SELECT
-            'DLKW05' AS step,(
-                SELECT
-                    SUM(tally)
-                FROM
-                    (
-                        SELECT
-                            COUNT(*) AS tally
-                        FROM
-                            mels_smoothie_challenge_db.information_schema.stages
-                        UNION all
-                        SELECT
-                            COUNT(*) AS tally
-                        FROM
-                            mels_smoothie_challenge_db.information_schema.file_formats
-                    )
-            ) AS actual,
-            4 AS expected,
-            'Camila\'s Trail Data IS Ready to Query' AS description
-    );
+
 CREATE VIEW MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.CHERRY_CREEK_TRAIL AS
 SELECT
     $1:sequence_1 AS point_id,
@@ -404,16 +279,6 @@ SELECT
 FROM @MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.TRAILS_GEOJSON
 (file_format => ff_json);
 
-SELECT GRADER(step, (actual = expected), actual, expected, description) AS graded_results FROM
-(
-SELECT
-'DLKW06' AS step
- ,( SELECT COUNT(*) AS tally
-      FROM mels_smoothie_challenge_db.information_schema.views 
-      WHERE table_name IN ('CHERRY_CREEK_TRAIL','DENVER_AREA_TRAILS')) AS actual
- ,2 AS expected
- ,'Mel\'s views ON the geospatial data FROM Camila' AS description
- ); 
 
 SELECT 'LINESTRING (' || LISTAGG(coord_pair, ',') WITHIN GROUP(ORDER BY point_id) || ')' my_linestring, ST_LENGTH(TO_GEOGRAPHY(my_linestring)) length_of_trail
 FROM MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.CHERRY_CREEK_TRAIL
@@ -496,16 +361,7 @@ SELECT
     MIN(MIN_EASTWEST) || ' ' || MIN(MIN_NORTHSOUTH) || '))'
 FROM trails_and_boundary;
 
-SELECT GRADER(step, (actual = expected), actual, expected, description) AS graded_results FROM
-(
- SELECT
-  'DLKW07' AS step
-   ,( SELECT round(MAX(max_northsouth))
-      FROM MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.TRAILS_AND_BOUNDARIES)
-      AS actual
- ,40 AS expected
- ,'Trails Northern Extent' AS description
- ); 
+
 
 -- Melanie's LOCATION INTO a 2 Variables (mc for melanies cafe)
 SET mc_lat='-104.97300245114094';
@@ -606,16 +462,7 @@ SELECT *
 FROM MELS_SMOOTHIE_CHALLENGE_DB.LOCATIONS.DENVER_BIKE_SHOPS 
 ORDER BY DISTANCE_TO_MELANIES;
 
-SELECT GRADER(step, (actual = expected), actual, expected, description) AS graded_results FROM
-(
-  SELECT
-  'DLKW08' AS step
-  ,( SELECT TRUNCATE(distance_to_melanies)
-      FROM mels_smoothie_challenge_db.locations.denver_bike_shops
-      WHERE name LIKE '%Mojo%') AS actual
-  ,14084 AS expected
-  ,'Bike Shop VIEW Distance Calc works' AS description
- ); 
+
 
 SELECT * FROM mels_smoothie_challenge_db.trails.cherry_creek_trail;
 
@@ -645,16 +492,3 @@ file_format = MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.FF_PARQUET;
 SELECT * FROM  mels_smoothie_challenge_db.trails.t_cherry_creek_trail;
 
 SELECT * FROM MELS_SMOOTHIE_CHALLENGE_DB.TRAILS.SMV_CHERRY_CREEK_TRAIL;
-
-SELECT GRADER(step, (actual = expected), actual, expected, description) AS graded_results FROM
-(
-  SELECT
-  'DLKW09' AS step
-  ,( SELECT ROW_COUNT
-     FROM mels_smoothie_challenge_db.information_schema.tables
-     WHERE table_schema = 'TRAILS'
-    AND table_name = 'SMV_CHERRY_CREEK_TRAIL')   
-   AS actual
-  ,3526 AS expected
-  ,'Secure Materialized VIEW Created' AS description
- ); 
