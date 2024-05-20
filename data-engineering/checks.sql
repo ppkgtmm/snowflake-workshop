@@ -1,177 +1,177 @@
 -- DO NOT EDIT THIS CODE
-select
+SELECT
     GRADER(
         step,
         (actual = expected),
         actual,
         expected,
         description
-    ) as graded_results
-from (
+    ) AS graded_results
+FROM (
     SELECT
-        'DNGW01' as step,(
-            select
-                count(*)
-            from
+        'DNGW01' AS step,(
+            SELECT
+                COUNT(*)
+            FROM
                 ags_game_audience.raw.logs
-            where
+            WHERE
                 is_timestamp_ntz(to_variant(datetime_iso8601)) = TRUE
-        ) as actual,
-        250 as expected,
-        'Project DB and Log File Set Up Correctly' as description
+        ) AS actual,
+        250 AS expected,
+        'Project DB AND Log FILE SET Up Correctly' AS description
 );
 
-select
+SELECT
     GRADER(
         step,
         (actual = expected),
         actual,
         expected,
         description
-    ) as graded_results
-from (
+    ) AS graded_results
+FROM (
     SELECT
-        'DNGW02' as step,(
-            select
-                sum(tally)
-            from(
-                    select
-                        (count(*) * -1) as tally
-                    from
+        'DNGW02' AS step,(
+            SELECT
+                SUM(tally)
+            FROM(
+                    SELECT
+                        (COUNT(*) * -1) AS tally
+                    FROM
                         ags_game_audience.raw.logs
-                    union all
-                    select
-                        count(*) as tally
-                    from
+                    UNION all
+                    SELECT
+                        COUNT(*) AS tally
+                    FROM
                         ags_game_audience.raw.game_logs
                 )
-        ) as actual,
-        250 as expected,
-        'View is filtered' as description
+        ) AS actual,
+        250 AS expected,
+        'View IS filtered' AS description
 );
 
-select
+SELECT
     GRADER(
         step,
         (actual = expected),
         actual,
         expected,
         description
-    ) as graded_results
-from (
+    ) AS graded_results
+FROM (
     SELECT
-        'DNGW03' as step,(
-            select
-                count(*)
-            from
+        'DNGW03' AS step,(
+            SELECT
+                COUNT(*)
+            FROM
                 ags_game_audience.enhanced.logs_enhanced
-            where
+            WHERE
                 dow_name = 'Sat'
-                and tod_name = 'Early evening'
-                and gamer_name like '%prajina'
-        ) as actual,
-        2 as expected,
-        'Playing the game on a Saturday evening' as description
+                AND tod_name = 'Early evening'
+                AND gamer_name LIKE '%prajina'
+        ) AS actual,
+        2 AS expected,
+        'Playing the game ON a Saturday evening' AS description
 );
 
-select
+SELECT
     GRADER(
         step,
         (actual = expected),
         actual,
         expected,
         description
-    ) as graded_results
-from (
+    ) AS graded_results
+FROM (
     SELECT
-        'DNGW04' as step,(
-            select
-                count(*) / iff (count(*) = 0, 1, count(*))
-            from
-                table(
+        'DNGW04' AS step,(
+            SELECT
+                COUNT(*) / iff (COUNT(*) = 0, 1, COUNT(*))
+            FROM
+                TABLE(
                     ags_game_audience.information_schema.task_history (task_name => 'LOAD_LOGS_ENHANCED')
                 )
-        ) as actual,
-        1 as expected,
-        'Task exists and has been run at least once' as description
+        ) AS actual,
+        1 AS expected,
+        'Task EXISTS AND has been run at least once' AS description
 );
 
-select
+SELECT
     GRADER(
         step,
         (actual = expected),
         actual,
         expected,
         description
-    ) as graded_results
-from (
+    ) AS graded_results
+FROM (
     SELECT
-        'DNGW05' as step,(
-            select
-                max(tally)
-            from
+        'DNGW05' AS step,(
+            SELECT
+                MAX(tally)
+            FROM
                 (
-                    select
+                    SELECT
                         CASE
                             WHEN SCHEDULED_FROM = 'SCHEDULE'
-                            and STATE = 'SUCCEEDED' THEN 1
+                            AND STATE = 'SUCCEEDED' THEN 1
                             ELSE 0
-                        END as tally
-                    from
-                        table(
+                        END AS tally
+                    FROM
+                        TABLE(
                             ags_game_audience.information_schema.task_history (task_name => 'GET_NEW_FILES')
                         )
                 )
-        ) as actual,
-        1 as expected,
-        'Task succeeds from schedule' as description
+        ) AS actual,
+        1 AS expected,
+        'Task succeeds FROM schedule' AS description
 );
 
-select
+SELECT
     GRADER(
         step,
         (actual = expected),
         actual,
         expected,
         description
-    ) as graded_results
-from (
+    ) AS graded_results
+FROM (
     SELECT
-        'DNGW06' as step,(
-            select
+        'DNGW06' AS step,(
+            SELECT
                 CASE
-                    WHEN pipe_status:executionState::text = 'RUNNING' THEN 1
+                    WHEN pipe_status:executionState::TEXT = 'RUNNING' THEN 1
                     ELSE 0
                 END
-            from(
-                    select
+            FROM(
+                    SELECT
                         parse_json(
                             SYSTEM$PIPE_STATUS('ags_game_audience.raw.PIPE_GET_NEW_FILES')
-                        ) as pipe_status
+                        ) AS pipe_status
                 )
-        ) as actual,
-        1 as expected,
-        'Pipe exists and is RUNNING' as description
+        ) AS actual,
+        1 AS expected,
+        'Pipe EXISTS AND IS RUNNING' AS description
 );
 
-select
+SELECT
     GRADER(
         step,
         (actual = expected),
         actual,
         expected,
         description
-    ) as graded_results
-from (
+    ) AS graded_results
+FROM (
     SELECT
-        'DNGW07' as step,(
-            select
-                count(*) / count(*)
-            from
+        'DNGW07' AS step,(
+            SELECT
+                COUNT(*) / COUNT(*)
+            FROM
                 snowflake.account_usage.query_history
-            where
-                query_text like '%case when game_session_length < 10%'
-        ) as actual,
-        1 as expected,
-        'Curated Data Lesson completed' as description
+            WHERE
+                query_text LIKE '%case WHEN game_session_length < 10%'
+        ) AS actual,
+        1 AS expected,
+        'Curated Data Lesson completed' AS description
 );
