@@ -1,6 +1,8 @@
 --Remember that every TIME you run a DORA CHECK, the context needs to be SET to the below settings. 
 USE DATABASE UTIL_DB;
+
 USE SCHEMA PUBLIC;
+
 USE role ACCOUNTADMIN;
 
 --Do NOT EDIT ANYTHING BELOW THIS LINE
@@ -126,7 +128,7 @@ SELECT GRADER(step, (actual = expected), actual, expected, description) AS grade
     AND stage_type='External Named') AS actual
   , 1 AS expected
   , 'External stage created' AS description
- );
+);
 
 --Set your worksheet DROP list role to ACCOUNTADMIN
 --Set your worksheet DROP list DATABASE AND SCHEMA to the LOCATION of your GRADER FUNCTION
@@ -139,7 +141,7 @@ SELECT GRADER(step, (actual = expected), actual, expected, description) AS grade
     WHERE table_name = 'VEGETABLE_DETAILS_SOIL_TYPE') AS actual
   , 42 AS expected
   , 'Veg Det Soil TYPE Count' AS description
- ); 
+); 
 
 --Set your worksheet DROP list role to ACCOUNTADMIN
 --Set your worksheet DROP list DATABASE AND SCHEMA to the LOCATION of your GRADER FUNCTION
@@ -202,7 +204,7 @@ SELECT GRADER(step, (actual = expected), actual, expected, description) AS grade
     WHERE table_name = 'AUTHOR_INGEST_JSON') AS actual
   ,6 AS expected
   ,'Check NUMBER of rows' AS description
- );
+);
 
 -- SET your worksheet DROP lists. DO NOT EDIT THE DORA CODE.
 SELECT GRADER(step, (actual = expected), actual, expected, description) AS graded_results FROM (   
@@ -223,7 +225,7 @@ SELECT GRADER(step, (actual = expected), actual, expected, description) AS grade
     WHERE table_name = 'TWEET_INGEST') AS actual
   , 9 AS expected
   ,'Check NUMBER of rows' AS description  
- ); 
+); 
 
 -- SET your worksheet DROP lists. DO NOT EDIT THE DORA CODE.
 
@@ -235,4 +237,4 @@ SELECT GRADER(step, (actual = expected), actual, expected, description) AS grade
     WHERE table_name = 'HASHTAGS_NORMALIZED') AS actual
   , 1 AS expected
   ,'Check NUMBER of rows' AS description
- ); 
+); 
